@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Computer Science Chart</title>
+
+  <script defer src="raphael.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.0.min.js"
+    integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous"></script>
+
+  <!-- update the version number as needed -->
+  <script defer src="/__/firebase/5.9.4/firebase-app.js"></script>
+  <!-- include only the Firebase features as you need -->
+  <script defer src="/__/firebase/5.9.4/firebase-firestore.js"></script>
+  <!-- initialize the SDK after all desired features are loaded -->
+  <script defer src="/__/firebase/init.js"></script>
+
+  <style media="screen">
+    body {
+      background: #ECEFF1;
+      color: rgba(0, 0, 0, 0.87);
+      font-family: Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="page">
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var paper = Raphael(0, 0, window.innerWidth, window.innerHeight)
+
+      var cx = window.innerWidth / 2;
+      var cy = window.innerHeight / 2
+      var w = 150;
+      var h = 80;
+
+      var app = firebase.app();
+      var db = firebase.firestore();
+
+      var docRef = db.collection("ComputerScience")
+
+      db.collection("ComputerScience").get().then(function (querySnapshot) {
+        querySnapshot.forEach(function (doc) {
+          // doc.data() is never undefined for query doc snapshots
+          console.log(doc.id, " => ", doc.data());
+
+          var node = paper.set();
+          rect = paper.rect(cx - (w / 2), cy - (h / 2), 150, 80).attr({ fill: "#3D5C9D" });
+          text = paper.text(cx, cy, doc.data().code).attr({ fill: "#FFFFFF", "stroke-width": "1", stroke: "#FFFFFF", "font-size": "20" })
+          node.push(text);
+          node.push(rect);
+
+
+        });
+      });
+    });
+
+
+
+
+  </script>
+</body>
+
+</html>
