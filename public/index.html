@@ -36,10 +36,34 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var paper = Raphael(0, 0, window.innerWidth, window.innerHeight);
+    var connections = [];
+    var paper = Raphael(0, 0, window.innerWidth, window.innerHeight);
+    Raphael.st.draggable = function () {
+      var me = this,
+        lx = 0,
+        ly = 0,
+        ox = 0,
+        oy = 0,
+        moveFnc = function (dx, dy) {
+          lx = dx + ox;
+          ly = dy + oy;
+          for (let i = 0; i < connections.length; i++) {
+            paper.connection(connections[i]);
+          }
+          me.transform('t' + lx + ',' + ly);
+        },
+        startFnc = function () { },
+        endFnc = function () {
+          ox = lx;
+          oy = ly;
+        };
 
-      var cx = window.innerWidth / 2-400;
+      this.drag(moveFnc, startFnc, endFnc);
+    };
+    document.addEventListener('DOMContentLoaded', function () {
+
+
+      var cx = window.innerWidth / 2 - 400;
       var cy = window.innerHeight / 2 - 250;
       var w = 150;
       var h = 80;
@@ -54,25 +78,27 @@
       db.collection("ComputerScience").get().then(function (querySnapshot) {
         var i = 0;
         var classes = [];
+        var connections = [];
         var rows = [];
 
         for (var i in querySnapshot.docs) {
           const doc = querySnapshot.docs[i];
-          classes[doc.id]=doc.data(); 
+          classes[doc.id] = doc.data();
         }
 
         for (var i in classes) {
           var node = paper.set();
           console.log(rows[classes[i].row]);
-          if(rows[classes[i].row] == null)rows[classes[i].row] = 0;
-          rect = paper.rect((cx - (w / 2))+(rows[classes[i].row]*200),(cy - (h / 2))+(classes[i].row*120), 150, 80).attr({ fill: "#3D5C9D" });
-          text = paper.text(cx+(rows[classes[i].row]*200), cy+(classes[i].row*120), classes[i].code).attr({ fill: "#FFFFFF", "stroke-width": "1", stroke: "#FFFFFF", "font-size": "20" })
+          if (rows[classes[i].row] == null) rows[classes[i].row] = 0;
+          rect = paper.rect((cx - (w / 2)) + (rows[classes[i].row] * 200), (cy - (h / 2)) + (classes[i].row * 120), 150, 80).attr({ fill: "#3D5C9D", cursor: "move" });
+          text = paper.text(cx + (rows[classes[i].row] * 200), cy + (classes[i].row * 120), classes[i].code).attr({ fill: "#FFFFFF", "stroke-width": "1", stroke: "#FFFFFF", "font-size": "20" })
           rows[classes[i].row]++;
           node.push(text);
           node.push(rect);
           nodes[i] = rect;
+          node.draggable();
 
-          if(classes[i].prereq.length > 0){
+          if (classes[i].prereq.length > 0) {
             for (let j = 0; j < classes[i].prereq.length; j++) {
               let element = classes[i].prereq[j] = Object.values(classes[i].prereq[j]);
             }
@@ -80,12 +106,12 @@
         }
 
         for (var i in classes) {
-          if(classes[i].prereq.length > 0){
+          if (classes[i].prereq.length > 0) {
             for (let j = 0; j < classes[i].prereq.length; j++) {
               for (let k = 0; k < classes[i].prereq[j].length; k++) {
-                console.log(i+" - "+classes[i].prereq[j][k]);
-                if(nodes[classes[i].prereq[j][k]]!=null)
-                paper.connection(nodes[i], nodes[classes[i].prereq[j][k]], "#fff", "blue")
+                console.log(i + " - " + classes[i].prereq[j][k]);
+                if (nodes[classes[i].prereq[j][k]] != null)
+                  connections.push(paper.connection(nodes[i], nodes[classes[i].prereq[j][k]], "#fff", "blue"));
               }
             }
           }
@@ -98,7 +124,7 @@
         // }
 
         // querySnapshot.forEach(function (doc) {
-          
+
 
         //   // doc.data() is never undefined for query doc snapshots
         //   // console.log(doc.id, " => ", doc.data());
@@ -113,11 +139,11 @@
         //   // if (i > 0)
         //   //   paper.connection(nodes[i], nodes[i - 1], "#fff", "blue")
         //   // i++;
-          
+
 
         // });
 
-        
+
 
       });
     });

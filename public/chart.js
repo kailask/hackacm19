@@ -6,14 +6,14 @@ Raphael.fn.connection = function (obj1, obj2, line, bg) {
     }
     var bb1 = obj1.getBBox(),
         bb2 = obj2.getBBox(),
-        p = [{x: bb1.x + bb1.width / 2, y: bb1.y - 1},
-        {x: bb1.x + bb1.width / 2, y: bb1.y + bb1.height + 1},
-        {x: bb1.x - 1, y: bb1.y + bb1.height / 2},
-        {x: bb1.x + bb1.width + 1, y: bb1.y + bb1.height / 2},
-        {x: bb2.x + bb2.width / 2, y: bb2.y - 1},
-        {x: bb2.x + bb2.width / 2, y: bb2.y + bb2.height + 1},
-        {x: bb2.x - 1, y: bb2.y + bb2.height / 2},
-        {x: bb2.x + bb2.width + 1, y: bb2.y + bb2.height / 2}],
+        p = [{ x: bb1.x + bb1.width / 2, y: bb1.y - 1 },
+        { x: bb1.x + bb1.width / 2, y: bb1.y + bb1.height + 1 },
+        { x: bb1.x - 1, y: bb1.y + bb1.height / 2 },
+        { x: bb1.x + bb1.width + 1, y: bb1.y + bb1.height / 2 },
+        { x: bb2.x + bb2.width / 2, y: bb2.y - 1 },
+        { x: bb2.x + bb2.width / 2, y: bb2.y + bb2.height + 1 },
+        { x: bb2.x - 1, y: bb2.y + bb2.height / 2 },
+        { x: bb2.x + bb2.width + 1, y: bb2.y + bb2.height / 2 }],
         d = {}, dis = [];
     for (var i = 0; i < 4; i++) {
         for (var j = 4; j < 8; j++) {
@@ -42,13 +42,13 @@ Raphael.fn.connection = function (obj1, obj2, line, bg) {
         y3 = [0, 0, 0, 0, y1 + dy, y1 - dy, y4, y4][res[1]].toFixed(3);
     var path = ["M", x1.toFixed(3), y1.toFixed(3), "C", x2, y2, x3, y3, x4.toFixed(3), y4.toFixed(3)].join(",");
     if (line && line.line) {
-        line.bg && line.bg.attr({path: path});
-        line.line.attr({path: path});
+        line.bg && line.bg.attr({ path: path });
+        line.line.attr({ path: path });
     } else {
         var color = typeof line == "string" ? line : "#000";
         return {
-            bg: bg && bg.split && this.path(path).attr({stroke: bg.split("|")[0], fill: "none", "stroke-width": bg.split("|")[1] || 3}),
-            line: this.path(path).attr({stroke: color, fill: "none"}),
+            bg: bg && bg.split && this.path(path).attr({ stroke: bg.split("|")[0], fill: "none", "stroke-width": bg.split("|")[1] || 3 }),
+            line: this.path(path).attr({ stroke: color, fill: "none" }),
             from: obj1,
             to: obj2
         };
