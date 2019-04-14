@@ -9,6 +9,12 @@
   <script src="https://code.jquery.com/jquery-3.4.0.min.js"
     integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous"></script>
 
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+  <!-- Compiled and minified JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
   <!-- update the version number as needed -->
   <script defer src="/__/firebase/5.9.4/firebase-app.js"></script>
   <!-- include only the Firebase features as you need -->
@@ -27,19 +33,29 @@
       margin: 0;
       padding: 0;
     }
+    #side {
+      padding-left: 100px;
+      padding-top:100px;
+    }
+    #side h5 {
+      text-align: center;
+    }
   </style>
 </head>
 
 <body>
+
   <div id="page">
 
+  </div>
+  <div id="side" style="width:400px">
   </div>
 
   <script>
     var connections = [];
     var classes = [];
     var nodes = [];
-    var paper = Raphael(0, 0, window.innerWidth, window.innerHeight);
+    var paper = Raphael(400, 0, window.innerWidth, window.innerHeight);
     Raphael.st.draggable = function () {
       var me = this,
         lx = 0,
@@ -55,7 +71,7 @@
         endFnc = function () {
           ox = lx;
           oy = ly;
-          $("path").each(function() {
+          $("path").each(function () {
             this.remove();
           });
           for (var i in classes) {
@@ -76,6 +92,9 @@
       this.drag(moveFnc, startFnc, endFnc);
     };
     document.addEventListener('DOMContentLoaded', function () {
+      M.AutoInit();
+
+      
 
       //   var dragger = function () {
       //     this.ox = this.type == "rect" ? this.attr("x") : this.attr("cx");
@@ -113,7 +132,7 @@
       // connections.push(r.connection(shapes[1], shapes[3], "#000", "#fff"));
 
 
-      var cx = window.innerWidth / 2 - 400;
+      var cx = window.innerWidth / 2 -700;
       var cy = window.innerHeight / 2 - 250;
       var w = 150;
       var h = 80;
@@ -143,6 +162,10 @@
           rows[classes[i].row]++;
           node.push(text);
           node.push(rect);
+          rect.class = classes[i];
+          node.dblclick(function () { 
+            var prereqs = 
+            generateInfo(this.class.description,"",this.class.name); console.log(this); });
           nodes[i] = node;
           node.draggable();
 
@@ -209,6 +232,51 @@
     //   }
     //   return prereqs;
     // }
+
+    function generateInfo(descript, preReq, className) {
+      $("#side").empty();
+
+      var div = $("<div></div>");
+
+      var header = $("<h5></h5>");
+      $(header).attr("className");
+      $(header).text(className);
+      $(header).appendTo(div);
+
+      var list1 = $("<ul></ul>");
+      $(list1).addClass("collapsible");
+      $(header).after(list1)
+
+      var sublist1 = $("<li></li>");
+      $(sublist1).addClass("active");
+      $(sublist1).appendTo(list1);
+
+      var desc = $("<div></div>").addClass("collapsible-header");
+      $(desc).text("Description");
+      $(desc).appendTo(sublist1);
+
+      var desc2 = $("<div></div>").addClass("collapsible-body");
+      $(desc2).text(descript);
+      $(desc).after(desc2);
+
+      var sublist2 = $("<li></li>");
+      $(sublist1).after(sublist2);
+
+      var preq = $("<div></div>").addClass("collapsible-header");
+      $(preq).text("Prerequisite");
+      $(preq).appendTo(sublist2);
+
+      var preq2 = $("<div></div>").addClass("collapsible-body");
+      $(preq2).text(preReq);
+      $(preq).after(preq2);
+
+
+      $("#side").append(div);
+
+      M.AutoInit();
+      var elems = document.querySelectorAll('.collapsible');
+			
+    }
 
   </script>
 </body>
