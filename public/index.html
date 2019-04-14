@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Computer Science Chart</title>
 
-  <script defer src="raphael.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.4.0.min.js"
     integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous"></script>
 
@@ -17,9 +16,12 @@
   <!-- initialize the SDK after all desired features are loaded -->
   <script defer src="/__/firebase/init.js"></script>
 
+  <script type="text/javascript" src="raphael.min.js"></script>
+  <script type="text/javascript" src="chart.js"></script>
+
   <style media="screen">
     body {
-      background: #ECEFF1;
+      background: "black";
       color: rgba(0, 0, 0, 0.87);
       font-family: Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
@@ -35,10 +37,10 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      var paper = Raphael(0, 0, window.innerWidth, window.innerHeight)
+      var paper = Raphael(0, 0, window.innerWidth, window.innerHeight);
 
-      var cx = window.innerWidth / 2;
-      var cy = window.innerHeight / 2
+      var cx = window.innerWidth / 2-400;
+      var cy = window.innerHeight / 2 - 250;
       var w = 150;
       var h = 80;
 
@@ -47,24 +49,92 @@
 
       var docRef = db.collection("ComputerScience")
 
-      db.collection("ComputerScience").get().then(function (querySnapshot) {
-        querySnapshot.forEach(function (doc) {
-          // doc.data() is never undefined for query doc snapshots
-          console.log(doc.id, " => ", doc.data());
+      var nodes = [];
 
+      db.collection("ComputerScience").get().then(function (querySnapshot) {
+        var i = 0;
+        var classes = [];
+        var rows = [];
+
+        for (var i in querySnapshot.docs) {
+          const doc = querySnapshot.docs[i];
+          classes[doc.id]=doc.data(); 
+        }
+
+        for (var i in classes) {
           var node = paper.set();
-          rect = paper.rect(cx - (w / 2), cy - (h / 2), 150, 80).attr({ fill: "#3D5C9D" });
-          text = paper.text(cx, cy, doc.data().code).attr({ fill: "#FFFFFF", "stroke-width": "1", stroke: "#FFFFFF", "font-size": "20" })
+          console.log(rows[classes[i].row]);
+          if(rows[classes[i].row] == null)rows[classes[i].row] = 0;
+          rect = paper.rect((cx - (w / 2))+(rows[classes[i].row]*200),(cy - (h / 2))+(classes[i].row*120), 150, 80).attr({ fill: "#3D5C9D" });
+          text = paper.text(cx+(rows[classes[i].row]*200), cy+(classes[i].row*120), classes[i].code).attr({ fill: "#FFFFFF", "stroke-width": "1", stroke: "#FFFFFF", "font-size": "20" })
+          rows[classes[i].row]++;
           node.push(text);
           node.push(rect);
+          nodes[i] = rect;
 
+          if(classes[i].prereq.length > 0){
+            for (let j = 0; j < classes[i].prereq.length; j++) {
+              let element = classes[i].prereq[j] = Object.values(classes[i].prereq[j]);
+            }
+          }
+        }
 
-        });
+        for (var i in classes) {
+          if(classes[i].prereq.length > 0){
+            for (let j = 0; j < classes[i].prereq.length; j++) {
+              for (let k = 0; k < classes[i].prereq[j].length; k++) {
+                console.log(i+" - "+classes[i].prereq[j][k]);
+                if(nodes[classes[i].prereq[j][k]]!=null)
+                paper.connection(nodes[i], nodes[classes[i].prereq[j][k]], "#fff", "blue")
+              }
+            }
+          }
+        }
+        console.log(classes);
+
+        // for (var i in classes) {
+        //   const doc = classes[i];
+        //   console.log(classes[i].code + ": " + countPrereq(classes[i])); 
+        // }
+
+        // querySnapshot.forEach(function (doc) {
+          
+
+        //   // doc.data() is never undefined for query doc snapshots
+        //   // console.log(doc.id, " => ", doc.data());
+
+        //   // var node = paper.set();
+        //   // rect = paper.rect(cx - (w / 2), cy - (h / 2) + (i * 100), 150, 80).attr({ fill: "#3D5C9D" });
+        //   // text = paper.text(cx, cy + (i * 100), doc.data().code).attr({ fill: "#FFFFFF", "stroke-width": "1", stroke: "#FFFFFF", "font-size": "20" })
+        //   // node.push(text);
+        //   // node.push(rect);
+        //   // nodes.push(node);
+        //   // // console.log(doc.data().code + ": " + countPrereq(doc.data()));
+        //   // if (i > 0)
+        //   //   paper.connection(nodes[i], nodes[i - 1], "#fff", "blue")
+        //   // i++;
+          
+
+        // });
+
+        
+
       });
     });
 
-
-
+    // function countPrereq(name,classes) {
+    //   if(name.count_prereqs != null)return count_prereqs;
+    //   var prereqs = 0;
+    //   if (name.prereq != null) {
+    //     for (let i = 0; i < name.prereq.length; i++) {
+    //       name.prereq[i] = Object.values(name.prereq[i]);
+    //       name.prereq[i].forEach(element => {
+    //         prereqs+=countPrereq(element,classes);
+    //       });
+    //     }
+    //   }
+    //   return prereqs;
+    // }
 
   </script>
 </body>
