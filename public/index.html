@@ -164,8 +164,19 @@
           node.push(rect);
           rect.class = classes[i];
           node.dblclick(function () { 
-            var prereqs = 
-            generateInfo(this.class.description,"",this.class.name); console.log(this); });
+            var prereqs = "";
+            console.log(this.class);
+            if(this.class.prereq.length > 0)
+            for (let i = 0; i < this.class.prereq.length; i++) {
+              const element = this.class.prereq[i];
+
+              for (let j = 0; j < element.length; j++) {
+                prereqs += element[j]+"; ";
+                
+              }
+              
+            }
+            generateInfo(this.class.description,prereqs,this.class.name); console.log(this); });
           nodes[i] = node;
           node.draggable();
 
